@@ -27,7 +27,7 @@ const createContact = (req,res)=>{
         throw new Error("All fields are mandatory")
     }
 
-    res.status(200).json({message:"Create new contact"})
+    res.status(200).json({message:"Create a new contact"})
 }
 
 //@desc Update specific contact
