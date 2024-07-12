@@ -1,4 +1,5 @@
 const asyncHandler = require("express-async-handler")
+const Contact = require("../models/contactModel")
 
 //contactController.js file
 
@@ -6,14 +7,20 @@ const asyncHandler = require("express-async-handler")
 //@route GET /api/contacts
 //@access public
 const getContacts = asyncHandler(async (req,res)=>{
-    res.status(200).json({message:"Get all contacts"})
+    const contacts = await Contact.find()
+    res.status(200).json(contacts)
 })
 
 //@desc Get specific contact
 //@route GET /api/contacts/:id
 //@access public
 const getContact =  asyncHandler(async (req,res)=>{
-    res.status(200).json({message:`Get contact ${req.params.id}`})
+    const contact = await Contact.findById(req.params.id);
+    if(!contact){
+        res.status(404);
+        throw new Error("Contact not found")
+    }
+    res.status(200).json(contact)
 })
 
 //@desc Create new contact
@@ -29,21 +36,45 @@ const createContact = asyncHandler(async (req,res)=>{
         throw new Error("All fields are mandatory")
     }
 
-    res.status(200).json({message:"Create a new contact"})
+    const contact = await Contact.create({
+        name:name,
+        email:email,
+        phone:phone  
+    })
+
+    res.status(200).json(contact)
 })
 
 //@desc Update specific contact
 //@route PUT /api/contacts/:id
 //@access public
 const updateContact = asyncHandler(async (req,res)=>{
-    res.status(200).json({message:`Update contact ${req.params.id}`})
+    const contact = await Contact.findById(req.params.id);
+    if(!contact){
+        res.status(404);
+        throw new Error("Contact not found")
+    }
+    const updatedContact = await Contact.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        {
+            new:true
+        }
+    )
+    res.status(200).json(updatedContact)
 })
 
 //@desc IUpdate specific contact
 //@route DELETE /api/contacts/:id
 //@access public
 const deleteContact = asyncHandler(async (req,res)=>{
-    res.status(200).json({message:`Delete contact ${req.params.id}`})
+    const contact = await Contact.findById(req.params.id);
+    if(!contact){
+        res.status(404);
+        throw new Error("Contact not found")
+    }
+    await Contact.deleteOne()
+    res.status(200).json(contact)
 })
 
 module.exports = {getContacts,getContact,createContact,updateContact,deleteContact}
